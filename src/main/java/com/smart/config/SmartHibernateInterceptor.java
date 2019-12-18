@@ -15,7 +15,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 @Component
-public class CustomHibernateInterceptor extends EmptyInterceptor {
+public class SmartHibernateInterceptor extends EmptyInterceptor {
 
     private String crudtype = "";
     private static final long serialVersionUID = -1;
