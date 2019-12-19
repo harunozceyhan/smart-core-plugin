@@ -1,13 +1,12 @@
 package com.smart.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import com.smart.model.base.BaseEntity;
 import org.hibernate.EmptyInterceptor;
 import com.smart.common.SmartLogger;
 import org.hibernate.type.Type;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.Iterator;
 
@@ -17,8 +16,6 @@ public class SmartHibernateInterceptor extends EmptyInterceptor {
     private String crudType = "";
     private static final long serialVersionUID = -1;
 
-    
-    @Value("${spring.application.name}") 
     private String appName;
 
     @Override
@@ -51,6 +48,14 @@ public class SmartHibernateInterceptor extends EmptyInterceptor {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
 }

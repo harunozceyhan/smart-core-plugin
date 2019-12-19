@@ -2,7 +2,7 @@ package com.smart.handler;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,15 +31,15 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.smart.common.SmartLogger;
+import com.smart.config.ApplicationProperties;
 import com.smart.error.ApiError;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-// @Slf4j
 public class SmartExceptionHandler  {
 
-    @Value("${spring.application.name}") 
-    private String appName;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     /**
      * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
@@ -282,7 +282,7 @@ public class SmartExceptionHandler  {
                 stackTrace += stackTraceElement.toString() + "\n";
             }
         }
-        SmartLogger.logError(appName, apiError.getStatus().name(), apiError.getMessage(), apiError.getDebugMessage(), stackTrace);        
+        SmartLogger.logError(applicationProperties.getName(), apiError.getStatus().name(), apiError.getMessage(), apiError.getDebugMessage(), stackTrace);        
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
