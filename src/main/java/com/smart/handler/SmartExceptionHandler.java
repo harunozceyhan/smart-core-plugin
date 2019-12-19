@@ -2,6 +2,7 @@ package com.smart.handler;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,12 +30,16 @@ import javax.persistence.EntityNotFoundException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.smart.common.SmartLogger;
 import com.smart.error.ApiError;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 // @Slf4j
 public class SmartExceptionHandler  {
+
+    @Value("${spring.application.name}") 
+    private String appName;
 
     /**
      * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
@@ -99,7 +104,7 @@ public class SmartExceptionHandler  {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
@@ -108,14 +113,14 @@ public class SmartExceptionHandler  {
 
     @ExceptionHandler(DataException.class)
     public ResponseEntity<Object> handleBadRequest(DataException ex, WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage("Data Exception error");
         return buildResponseEntity(apiError);
     }
 
     @ExceptionHandler(RepositoryConstraintViolationException.class)
     public ResponseEntity<Object> handleBadRequest(RepositoryConstraintViolationException ex, WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getErrors().getFieldErrors());
         return buildResponseEntity(apiError);
@@ -123,7 +128,7 @@ public class SmartExceptionHandler  {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleBadRequest(DataIntegrityViolationException ex, WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage("Constraint Viaolation Error");
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
@@ -131,7 +136,7 @@ public class SmartExceptionHandler  {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleBadRequest(ConstraintViolationException ex, WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage("Constraint Viaolation Error");
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
@@ -145,7 +150,7 @@ public class SmartExceptionHandler  {
      */
     @ExceptionHandler(javax.validation.ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolation(javax.validation.ConstraintViolationException ex) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getConstraintViolations());
         return buildResponseEntity(apiError);
@@ -159,14 +164,14 @@ public class SmartExceptionHandler  {
      */
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
-        ApiError apiError = new ApiError(NOT_FOUND);
+        ApiError apiError = new ApiError(NOT_FOUND, ex);
         apiError.setMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request) {
-        ApiError apiError = new ApiError(NOT_FOUND);
+        ApiError apiError = new ApiError(NOT_FOUND, ex);
         apiError.setMessage(ex.getMessage());
         apiError.setDebugMessage(request.getDescription(false));
         return buildResponseEntity(apiError);
@@ -182,8 +187,6 @@ public class SmartExceptionHandler  {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest request) {
-        //ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-        // log.info("{} to {}", servletWebRequest.getHttpMethod(), servletWebRequest.getRequest().getServletPath());
         String error = "Malformed JSON request";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
     }
@@ -265,14 +268,25 @@ public class SmartExceptionHandler  {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        ApiError apiError = new ApiError(BAD_REQUEST, ex);
         apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'", ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName()));
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
 
+    private void logApiError(ApiError apiError) {
+        String stackTrace = "";
+        Throwable exception = apiError.getException();
+        if (exception != null) {
+            for ( StackTraceElement stackTraceElement : exception.getStackTrace()) {
+                stackTrace += stackTraceElement.toString() + "\n";
+            }
+        }
+        SmartLogger.logError(appName, apiError.getStatus().name(), apiError.getMessage(), apiError.getDebugMessage(), stackTrace);        
+    }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+        this.logApiError(apiError);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 

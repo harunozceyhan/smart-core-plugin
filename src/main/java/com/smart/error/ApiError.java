@@ -1,6 +1,7 @@
 package com.smart.error;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.smart.common.LowerCaseClassNameResolver;
@@ -18,10 +19,9 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.CUSTOM, property = "error", visible = true)
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CUSTOM, property = "error", visible = false)
 @JsonTypeIdResolver(LowerCaseClassNameResolver.class)
-public
-class ApiError {
+public class ApiError {
 
     private HttpStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
@@ -29,6 +29,8 @@ class ApiError {
     private String message;
     private String debugMessage;
     private List<ApiSubError> subErrors;
+    @JsonIgnore
+    private Throwable exception;
 
     private ApiError() {
         timestamp = LocalDateTime.now();
@@ -42,7 +44,7 @@ class ApiError {
     public ApiError(HttpStatus status, Throwable ex) {
         this();
         this.status = status;
-        this.message = "Unexpected error";
+        this.exception = ex;
         this.debugMessage = ex.getLocalizedMessage();
     }
 
@@ -50,6 +52,7 @@ class ApiError {
         this();
         this.status = status;
         this.message = message;
+        this.exception = ex;
         this.debugMessage = ex.getLocalizedMessage();
     }
 
@@ -69,11 +72,7 @@ class ApiError {
     }
 
     private void addValidationError(FieldError fieldError) {
-        this.addValidationError(
-                fieldError.getObjectName(),
-                fieldError.getField(),
-                fieldError.getRejectedValue(),
-                fieldError.getDefaultMessage());
+        this.addValidationError(fieldError.getObjectName(), fieldError.getField(), fieldError.getRejectedValue(), fieldError.getDefaultMessage());
     }
 
     public void addValidationErrors(List<FieldError> fieldErrors) {
@@ -81,9 +80,7 @@ class ApiError {
     }
 
     private void addValidationError(ObjectError objectError) {
-        this.addValidationError(
-                objectError.getObjectName(),
-                objectError.getDefaultMessage());
+        this.addValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
     }
 
     public void addValidationError(List<ObjectError> globalErrors) {
@@ -96,16 +93,11 @@ class ApiError {
      * @param cv the ConstraintViolation
      */
     private void addValidationError(ConstraintViolation<?> cv) {
-        this.addValidationError(
-                cv.getRootBeanClass().getSimpleName(),
-                ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(),
-                cv.getInvalidValue(),
-                cv.getMessage());
+        this.addValidationError(cv.getRootBeanClass().getSimpleName(), ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(), cv.getInvalidValue(), cv.getMessage());
     }
 
     public void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations) {
         constraintViolations.forEach(this::addValidationError);
     }
-
 
 }
