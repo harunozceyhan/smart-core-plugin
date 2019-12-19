@@ -19,10 +19,16 @@ public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Value("${security.signing.key}")
     private String signingKey;
 
+    @Value("${spring.application.name}")
+    private String appName;
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
 	@Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().authorizeRequests().antMatchers("/actuator/health").permitAll().and().
-        addFilterBefore(new JwtTokenAuthenticationFilter(signingKey), BasicAuthenticationFilter.class).authorizeRequests().anyRequest().authenticated().and().
+        addFilterBefore(new JwtTokenAuthenticationFilter(appName, signingKey, contextPath), BasicAuthenticationFilter.class).authorizeRequests().anyRequest().authenticated().and().
         sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().httpBasic().disable().authorizeRequests().and().formLogin().disable();
 	}
 }
