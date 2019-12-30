@@ -9,11 +9,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Component
 @Configuration
 @EnableWebSecurity
-@Profile(value = {"dev", "prod"})
+@Profile(value = { "dev", "prod" })
 public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Value("${security.signing.key}")
@@ -25,10 +26,15 @@ public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
-	@Override
+    @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable().authorizeRequests().antMatchers("/actuator/health").permitAll().and().
-        addFilterBefore(new JwtTokenAuthenticationFilter(appName, signingKey, contextPath), BasicAuthenticationFilter.class).authorizeRequests().anyRequest().authenticated().and().
-        sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().httpBasic().disable().authorizeRequests().and().formLogin().disable();
-	}
+        httpSecurity.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and()
+                .csrf().disable().authorizeRequests().antMatchers("/actuator/health").permitAll().and()
+                .addFilterBefore(new JwtTokenAuthenticationFilter(appName, signingKey, contextPath),
+                        BasicAuthenticationFilter.class)
+                .authorizeRequests().anyRequest().authenticated().and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().httpBasic().disable().authorizeRequests()
+                .and().formLogin().disable();
+    }
+
 }
