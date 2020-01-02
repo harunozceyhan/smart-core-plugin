@@ -54,20 +54,25 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
                 DecodedJWT decodedJWT = JWT.require(Algorithm.RSA256(pubKey, null)).build()
                         .verify(token.replace("Bearer ", ""));
                 String user = decodedJWT.getClaim("preferred_username").asString();
-                HashMap<String, ArrayList<String>> clientMap = ((HashMap<String, ArrayList<String>>) decodedJWT
-                        .getClaim("resource_access").asMap().get(appName));
-                if (clientMap == null) {
+                if (decodedJWT.getClaim("resource_access").isNull()) {
                     throw new AccessDeniedException("Client Service Not Found!");
                 } else {
-                    String defaultMapping = request.getRequestURI().replace(contextPath + "/", "").split("/")[0];
-                    Long permissionCount = clientMap.get("roles").stream()
-                            .filter(permission -> permission.equals("*") || permission.equals(defaultMapping + ":*")
-                                    || permission.equals(defaultMapping + ":" + request.getMethod().toLowerCase()))
-                            .count();
-                    if (permissionCount == 0) {
-                        throw new AccessDeniedException("Permission Not Found!");
+                    HashMap<String, ArrayList<String>> clientMap = ((HashMap<String, ArrayList<String>>) decodedJWT
+                            .getClaim("resource_access").asMap().get(appName));
+                    if (clientMap == null) {
+                        throw new AccessDeniedException("Client Service Not Found!");
+                    } else {
+                        String defaultMapping = request.getRequestURI().replace(contextPath + "/", "").split("/")[0];
+                        Long permissionCount = clientMap.get("roles").stream()
+                                .filter(permission -> permission.equals("*") || permission.equals(defaultMapping + ":*")
+                                        || permission.equals(defaultMapping + ":" + request.getMethod().toLowerCase()))
+                                .count();
+                        if (permissionCount == 0) {
+                            throw new AccessDeniedException("Permission Not Found!");
+                        }
                     }
                 }
+
                 if (user != null) {
                     return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
                 }
