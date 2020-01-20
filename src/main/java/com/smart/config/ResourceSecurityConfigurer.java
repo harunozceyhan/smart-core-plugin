@@ -28,8 +28,14 @@ public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()).and()
-                .csrf().disable().authorizeRequests().antMatchers("/actuator/health").permitAll().and()
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.applyPermitDefaultValues();
+        corsConfiguration.addAllowedMethod("GET");
+        corsConfiguration.addAllowedMethod("POST");
+        corsConfiguration.addAllowedMethod("PUT");
+        corsConfiguration.addAllowedMethod("DELETE");
+        httpSecurity.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().authorizeRequests()
+                .antMatchers("/actuator/health").permitAll().and()
                 .addFilterBefore(new JwtTokenAuthenticationFilter(appName, signingKey, contextPath),
                         BasicAuthenticationFilter.class)
                 .authorizeRequests().anyRequest().authenticated().and().sessionManagement()
