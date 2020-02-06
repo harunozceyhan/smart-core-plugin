@@ -14,7 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @Component
 @Configuration
 @EnableWebSecurity
-@Profile(value = { "dev", "prod" })
+@Profile(value = { "dev", "stage", "prod" })
 public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Value("${security.signing.key}")
