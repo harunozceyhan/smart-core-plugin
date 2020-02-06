@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.EntityType;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
 import com.smart.annotation.MetaColumn;
@@ -27,6 +28,9 @@ public class MetaDataServiceImpl implements MetaDataService {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     public Map<String, Object> getMetaDataOfClass(String name) {
         Map<String, Object> responseMap = new HashMap<String, Object>();
 
@@ -36,12 +40,13 @@ public class MetaDataServiceImpl implements MetaDataService {
                 .findFirst().orElse(null);
 
         if (entityType != null) {
+            String contextPath = httpServletRequest.getContextPath().replaceFirst("/", "") + "/";
             Metadata classMetadata = entityType.getJavaType().getAnnotation(Metadata.class);
             responseMap.put("value", classMetadata.value());
             responseMap.put("title", classMetadata.title());
             responseMap.put("detailTitleKey", classMetadata.detailTitleKey());
-            responseMap.put("baseUrl", classMetadata.baseUrl());
-            responseMap.put("getUrl", classMetadata.getUrl());
+            responseMap.put("baseUrl", contextPath + classMetadata.baseUrl());
+            responseMap.put("getUrl", contextPath + classMetadata.getUrl());
             responseMap.put("responseKey", classMetadata.responseKey());
             responseMap.put("columns", getColumnListOfClass(entityType));
             responseMap.put("tabs", getTabListOfClass(entityType));
@@ -73,6 +78,7 @@ public class MetaDataServiceImpl implements MetaDataService {
     }
 
     public Map<String, Object> getTabMetaDataOfClass(Field field) {
+        String contextPath = httpServletRequest.getContextPath().replaceFirst("/", "") + "/";
         Map<String, Object> responseMap = new HashMap<String, Object>();
         Class<?> fieldClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         EntityType<?> entityType = entityManager.getMetamodel().entity(fieldClass);
@@ -83,8 +89,8 @@ public class MetaDataServiceImpl implements MetaDataService {
             responseMap.put("value", classMetadata.value());
             responseMap.put("title", classMetadata.title());
             responseMap.put("detailTitleKey", classMetadata.detailTitleKey());
-            responseMap.put("baseUrl", classMetadata.baseUrl());
-            responseMap.put("getUrl", classMetadata.getUrl());
+            responseMap.put("baseUrl", contextPath + classMetadata.baseUrl());
+            responseMap.put("getUrl", contextPath + classMetadata.getUrl());
             responseMap.put("responseKey", classMetadata.responseKey());
             responseMap.put("columns", getColumnListOfClass(entityType));
         } else {
@@ -95,6 +101,7 @@ public class MetaDataServiceImpl implements MetaDataService {
     }
 
     public Map<String, Object> getColumnMetaDataOfClass(Field field) {
+        String contextPath = httpServletRequest.getContextPath().replaceFirst("/", "") + "/";
         Map<String, Object> columnsMap = new HashMap<String, Object>();
         MetaColumn fieldMeta = field.getAnnotation(MetaColumn.class);
         String fieldType = field.getType().getSimpleName();
@@ -133,7 +140,7 @@ public class MetaDataServiceImpl implements MetaDataService {
         columnsMap.put("tableValue", fieldMeta.tableValue().equals("") ? field.getName() : fieldMeta.tableValue());
         columnsMap.put("searchKey", fieldMeta.searchKey().equals("") ? field.getName() : fieldMeta.searchKey());
         columnsMap.put("width", fieldMeta.width());
-        columnsMap.put("url", fieldMeta.url());
+        columnsMap.put("url", contextPath + fieldMeta.url());
         columnsMap.put("responseKey", fieldMeta.responseKey());
         columnsMap.put("itemText", fieldMeta.itemText());
         columnsMap.put("sortable", fieldMeta.sortable());
