@@ -124,7 +124,7 @@ public class MetaDataServiceImpl implements MetaDataService {
             columnsMap.put("type", fieldMeta.type().equals("") ? "object" : fieldMeta.type());
             columnsMap.put("formType", fieldMeta.formType().equals("") ? "combobox" : fieldMeta.formType());
             columnsMap.put("metadata", field.getType().getAnnotation(Metadata.class).value());
-            columnsMap.put("metadataUrl", contextPath + field.getType().getAnnotation(Metadata.class).value());
+            columnsMap.put("metadataUrl", contextPath + "metadata/" + field.getType().getAnnotation(Metadata.class).value());
         }
 
         if (field.isAnnotationPresent(Length.class)) {
