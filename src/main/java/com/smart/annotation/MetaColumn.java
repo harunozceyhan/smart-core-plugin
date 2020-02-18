@@ -26,6 +26,8 @@ public @interface MetaColumn {
 
     String tableValue() default ""; // default
 
+    String filterBy() default ""; // default
+
     boolean required() default false; // default
 
     boolean sortable() default false; // custom

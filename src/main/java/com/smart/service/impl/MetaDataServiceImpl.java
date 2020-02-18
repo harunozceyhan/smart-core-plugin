@@ -122,9 +122,11 @@ public class MetaDataServiceImpl implements MetaDataService {
             columnsMap.put("formType", fieldMeta.formType().equals("") ? "text" : fieldMeta.formType());
         } else { // Object
             columnsMap.put("type", fieldMeta.type().equals("") ? "object" : fieldMeta.type());
+            columnsMap.put("filterBy", fieldMeta.filterBy());
             columnsMap.put("formType", fieldMeta.formType().equals("") ? "combobox" : fieldMeta.formType());
             columnsMap.put("metadata", field.getType().getAnnotation(Metadata.class).value());
-            columnsMap.put("metadataUrl", contextPath + "metadata/" + field.getType().getAnnotation(Metadata.class).value());
+            columnsMap.put("metadataUrl",
+                    contextPath + "metadata/" + field.getType().getAnnotation(Metadata.class).value());
         }
 
         if (field.isAnnotationPresent(Length.class)) {
