@@ -34,6 +34,8 @@ public @interface MetaColumn {
 
     boolean searchable() default false; // custom
 
+    boolean updatable() default true; // default
+
     String searchKey() default ""; // default
 
     boolean showInTable() default false; // custom

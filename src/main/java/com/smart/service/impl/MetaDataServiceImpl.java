@@ -149,6 +149,7 @@ public class MetaDataServiceImpl implements MetaDataService {
         columnsMap.put("sortable", fieldMeta.sortable());
         columnsMap.put("showInTable", fieldMeta.showInTable());
         columnsMap.put("searchable", fieldMeta.searchable());
+        columnsMap.put("updatable", fieldMeta.updatable());
 
         return columnsMap;
     }
