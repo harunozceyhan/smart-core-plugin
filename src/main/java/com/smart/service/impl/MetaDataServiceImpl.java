@@ -61,9 +61,7 @@ public class MetaDataServiceImpl implements MetaDataService {
         List<Map<String, Object>> columnList = new ArrayList<>();
         List<Field> fieldList = Arrays.asList(entityType.getJavaType().getDeclaredFields()).stream()
                 .filter(field -> field.isAnnotationPresent(MetaColumn.class)).collect(Collectors.toList());
-        fieldList.forEach(field -> {
-            columnList.add(getColumnMetaDataOfClass(field));
-        });
+        fieldList.forEach(field -> columnList.add(getColumnMetaDataOfClass(field)));
         return columnList;
     }
 
