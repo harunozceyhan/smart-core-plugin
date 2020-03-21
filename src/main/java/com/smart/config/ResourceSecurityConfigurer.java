@@ -1,5 +1,6 @@
 package com.smart.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,8 +18,8 @@ import org.springframework.web.cors.CorsConfiguration;
 @Profile(value = { "dev", "stage", "prod" })
 public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
-    @Value("${security.signing.key}")
-    private String signingKey;
+    @Autowired
+    ApplicationProperties applicationProperties;
 
     @Value("${spring.application.name}")
     private String appName;
@@ -36,7 +37,8 @@ public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
         corsConfiguration.addAllowedMethod("DELETE");
         httpSecurity.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().authorizeRequests()
                 .antMatchers("/actuator/health").permitAll().and()
-                .addFilterBefore(new JwtTokenAuthenticationFilter(appName, signingKey, contextPath),
+                .addFilterBefore(
+                        new JwtTokenAuthenticationFilter(appName, applicationProperties.getSigningKey(), contextPath),
                         BasicAuthenticationFilter.class)
                 .authorizeRequests().anyRequest().authenticated().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().httpBasic().disable().authorizeRequests()

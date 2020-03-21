@@ -1,11 +1,11 @@
 package com.smart.controller;
 
 import javax.persistence.EntityManager;
-import com.smart.service.interfc.MetaDataService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.smart.service.metadata.MetaDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

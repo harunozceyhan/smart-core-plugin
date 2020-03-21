@@ -1,4 +1,4 @@
-package com.smart.service.impl;
+package com.smart.service.metadata;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -18,12 +18,11 @@ import com.smart.annotation.MetaTab;
 import com.smart.annotation.Metadata;
 import org.springframework.stereotype.Service;
 import org.hibernate.validator.constraints.Length;
-import com.smart.service.interfc.MetaDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 @Service
-public class MetaDataServiceImpl implements MetaDataService {
+public class MetaDataService {
 
     @Autowired
     EntityManager entityManager;

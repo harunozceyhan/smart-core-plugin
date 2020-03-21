@@ -10,6 +10,13 @@ import lombok.Data;
 @Component
 @Configuration
 public class ApplicationProperties {
+    
     @Value("${spring.application.name}")
     private String name;
+
+    @Value("${security.token.token-url}")
+    private String tokenUrl;
+
+    private String signingKey;
+
 }
