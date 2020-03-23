@@ -10,9 +10,12 @@ import lombok.Data;
 @Component
 @Configuration
 public class ApplicationProperties {
-    
+
     @Value("${spring.application.name}")
     private String name;
+
+    @Value("${spring.application.admin-role}")
+    private String adminRole;
 
     @Value("${security.token.token-url}")
     private String tokenUrl;
