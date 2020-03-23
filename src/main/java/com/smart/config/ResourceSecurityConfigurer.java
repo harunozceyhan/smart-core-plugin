@@ -33,8 +33,7 @@ public class ResourceSecurityConfigurer extends WebSecurityConfigurerAdapter {
         corsConfiguration.addAllowedMethod("DELETE");
         httpSecurity.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().authorizeRequests()
                 .antMatchers("/actuator/health").permitAll().and()
-                .addFilterBefore(
-                        new JwtTokenAuthenticationFilter(appName, ApplicationProperties.signingKey, contextPath),
+                .addFilterBefore(new JwtTokenAuthenticationFilter(appName, contextPath),
                         BasicAuthenticationFilter.class)
                 .authorizeRequests().anyRequest().authenticated().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().httpBasic().disable().authorizeRequests()

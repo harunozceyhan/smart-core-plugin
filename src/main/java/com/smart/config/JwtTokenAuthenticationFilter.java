@@ -22,11 +22,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private String appName;
-    private String signingKey;
     private String contextPath;
 
-    public JwtTokenAuthenticationFilter(String appName, String signingKey, String contextPath) {
-        this.signingKey = signingKey;
+    public JwtTokenAuthenticationFilter(String appName, String contextPath) {
         this.appName = appName;
         this.contextPath = contextPath;
     }
@@ -49,7 +47,8 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 KeyFactory kf = KeyFactory.getInstance("RSA");
-                X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.decodeBase64(signingKey));
+                X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(
+                        Base64.decodeBase64(ApplicationProperties.signingKey));
                 RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
                 DecodedJWT decodedJWT = JWT.require(Algorithm.RSA256(pubKey, null)).build()
                         .verify(token.replace("Bearer ", ""));
