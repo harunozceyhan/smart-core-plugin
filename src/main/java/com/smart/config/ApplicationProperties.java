@@ -19,7 +19,7 @@ public class ApplicationProperties {
     @Value("${spring.application.admin-role}")
     private String adminRole;
 
-    @Value("${security.token.token-url}")
-    private String tokenUrl;
+    @Value("${security.token.realm-url}")
+    private String realmUrl;
 
 }

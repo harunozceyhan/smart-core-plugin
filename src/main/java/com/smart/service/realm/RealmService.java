@@ -18,7 +18,7 @@ public class RealmService {
 
     public void setPublicKey() {
         ApplicationProperties.signingKey = JsonParser
-                .parseString(publicRestTemplate.getForObject(applicationProperties.getTokenUrl(), String.class))
+                .parseString(publicRestTemplate.getForObject(applicationProperties.getRealmUrl(), String.class))
                 .getAsJsonObject().get("public_key").getAsString();
     }
 }
