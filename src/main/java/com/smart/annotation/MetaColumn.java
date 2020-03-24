@@ -18,6 +18,8 @@ public @interface MetaColumn {
 
     String metadata() default ""; // custom
 
+    String contextPath() default ""; // custom
+
     String url() default ""; // custom
 
     String responseKey() default ""; // custom

@@ -98,7 +98,6 @@ public class MetaDataService {
     }
 
     public Map<String, Object> getColumnMetaDataOfClass(Field field) {
-        String contextPath = httpServletRequest.getContextPath().replaceFirst("/", "") + "/";
         Map<String, Object> columnsMap = new HashMap<String, Object>();
         MetaColumn fieldMeta = field.getAnnotation(MetaColumn.class);
         String fieldType = field.getType().getSimpleName();
@@ -123,7 +122,7 @@ public class MetaDataService {
             columnsMap.put("formType", fieldMeta.formType().equals("") ? "combobox" : fieldMeta.formType());
             columnsMap.put("metadata", field.getType().getAnnotation(Metadata.class).value());
             columnsMap.put("metadataUrl",
-                    contextPath + "metadata/" + field.getType().getAnnotation(Metadata.class).value());
+                    fieldMeta.contextPath() + "metadata/" + field.getType().getAnnotation(Metadata.class).value());
         }
 
         if (field.isAnnotationPresent(Length.class)) {
@@ -140,7 +139,7 @@ public class MetaDataService {
         columnsMap.put("tableValue", fieldMeta.tableValue().equals("") ? field.getName() : fieldMeta.tableValue());
         columnsMap.put("searchKey", fieldMeta.searchKey().equals("") ? field.getName() : fieldMeta.searchKey());
         columnsMap.put("width", fieldMeta.width());
-        columnsMap.put("url", contextPath + fieldMeta.url());
+        columnsMap.put("url", fieldMeta.contextPath() + fieldMeta.url());
         columnsMap.put("responseKey", fieldMeta.responseKey());
         columnsMap.put("itemText", fieldMeta.itemText());
         columnsMap.put("sortable", fieldMeta.sortable());
