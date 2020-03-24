@@ -122,7 +122,7 @@ public class MetaDataService {
             columnsMap.put("formType", fieldMeta.formType().equals("") ? "combobox" : fieldMeta.formType());
             columnsMap.put("metadata", field.getType().getAnnotation(Metadata.class).value());
             columnsMap.put("metadataUrl",
-                    fieldMeta.contextPath() + "metadata/" + field.getType().getAnnotation(Metadata.class).value());
+                    fieldMeta.contextPath() + "/metadata/" + field.getType().getAnnotation(Metadata.class).value());
         }
 
         if (field.isAnnotationPresent(Length.class)) {
