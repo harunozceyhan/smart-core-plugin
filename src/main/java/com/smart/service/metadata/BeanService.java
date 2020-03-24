@@ -28,30 +28,36 @@ public class BeanService {
         List<String> controllerList = new ArrayList<>();
 
         controllerList.addAll(getRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c))
-                .collect(Collectors.toList()));
+                .map(c -> c.concat(":menu")).collect(Collectors.toList()));
+        controllerList.addAll(getRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c))
+                .map(c -> c.concat(":*")).collect(Collectors.toList()));
         controllerList.addAll(getRepositoryRestControllerAnnotatedList().stream()
-                .filter(c -> !controllerList.contains(c)).collect(Collectors.toList()));
+                .filter(c -> !controllerList.contains(c)).map(c -> c.concat(":menu")).collect(Collectors.toList()));
+        controllerList.addAll(getRepositoryRestControllerAnnotatedList().stream()
+                .filter(c -> !controllerList.contains(c)).map(c -> c.concat(":*")).collect(Collectors.toList()));
         controllerList.addAll(getRepositoryRestResourceAnnotatedList().stream().filter(c -> !controllerList.contains(c))
-                .collect(Collectors.toList()));
+                .map(c -> c.concat(":menu")).collect(Collectors.toList()));
+        controllerList.addAll(getRepositoryRestResourceAnnotatedList().stream().filter(c -> !controllerList.contains(c))
+                .map(c -> c.concat(":*")).collect(Collectors.toList()));
         return controllerList.stream().map(c -> Map.of("name", c)).collect(Collectors.toList());
     }
 
     public List<String> getRestControllerAnnotatedList() {
         return listableBeanFactory.getBeansWithAnnotation(RestController.class).entrySet().stream()
                 .map(c -> getControllerAnnotationValue(c.getValue().toString().split("@")[0]))
-                .filter(c -> !c.equals("")).map(c -> c.replaceAll("/", "").concat(":*")).collect(Collectors.toList());
+                .filter(c -> !c.equals("")).map(c -> c.replaceAll("/", "")).collect(Collectors.toList());
     }
 
     public List<String> getRepositoryRestControllerAnnotatedList() {
         return listableBeanFactory.getBeansWithAnnotation(RepositoryRestController.class).entrySet().stream()
                 .map(c -> getControllerAnnotationValue(c.getValue().toString().split("@")[0]))
-                .filter(c -> !c.equals("")).map(c -> c.replaceAll("/", "").concat(":*")).collect(Collectors.toList());
+                .filter(c -> !c.equals("")).map(c -> c.replaceAll("/", "")).collect(Collectors.toList());
     }
 
     public List<String> getRepositoryRestResourceAnnotatedList() {
         return entityManager.getMetamodel().getEntities().stream()
                 .filter(entity -> entity.getJavaType().isAnnotationPresent(Metadata.class))
-                .map(entity -> entity.getJavaType().getAnnotation(Metadata.class).baseUrl().concat(":*"))
+                .map(entity -> entity.getJavaType().getAnnotation(Metadata.class).baseUrl())
                 .collect(Collectors.toList());
     }
 
