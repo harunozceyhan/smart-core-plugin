@@ -27,18 +27,21 @@ public class BeanService {
     public List<Map<String, String>> getAllControllers() {
         List<String> controllerList = new ArrayList<>();
 
-        controllerList.addAll(getRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c))
-                .map(c -> c.concat(":menu")).collect(Collectors.toList()));
-        controllerList.addAll(getRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c))
+        controllerList
+                .addAll(getRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c + ":menu"))
+                        .map(c -> c.concat(":menu")).collect(Collectors.toList()));
+        controllerList.addAll(getRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c + ":*"))
                 .map(c -> c.concat(":*")).collect(Collectors.toList()));
+        controllerList.addAll(
+                getRepositoryRestControllerAnnotatedList().stream().filter(c -> !controllerList.contains(c + ":menu"))
+                        .map(c -> c.concat(":menu")).collect(Collectors.toList()));
         controllerList.addAll(getRepositoryRestControllerAnnotatedList().stream()
-                .filter(c -> !controllerList.contains(c)).map(c -> c.concat(":menu")).collect(Collectors.toList()));
-        controllerList.addAll(getRepositoryRestControllerAnnotatedList().stream()
-                .filter(c -> !controllerList.contains(c)).map(c -> c.concat(":*")).collect(Collectors.toList()));
-        controllerList.addAll(getRepositoryRestResourceAnnotatedList().stream().filter(c -> !controllerList.contains(c))
-                .map(c -> c.concat(":menu")).collect(Collectors.toList()));
-        controllerList.addAll(getRepositoryRestResourceAnnotatedList().stream().filter(c -> !controllerList.contains(c))
-                .map(c -> c.concat(":*")).collect(Collectors.toList()));
+                .filter(c -> !controllerList.contains(c + ":*")).map(c -> c.concat(":*")).collect(Collectors.toList()));
+        controllerList.addAll(
+                getRepositoryRestResourceAnnotatedList().stream().filter(c -> !controllerList.contains(c + ":menu"))
+                        .map(c -> c.concat(":menu")).collect(Collectors.toList()));
+        controllerList.addAll(getRepositoryRestResourceAnnotatedList().stream()
+                .filter(c -> !controllerList.contains(c + ":*")).map(c -> c.concat(":*")).collect(Collectors.toList()));
         return controllerList.stream().map(c -> Map.of("name", c)).collect(Collectors.toList());
     }
 
