@@ -47,6 +47,7 @@ public class MetaDataService {
             responseMap.put("baseUrl", contextPath + classMetadata.baseUrl());
             responseMap.put("getUrl", contextPath + classMetadata.getUrl());
             responseMap.put("responseKey", classMetadata.responseKey());
+            responseMap.put("factory", classMetadata.factory());
             responseMap.put("columns", getColumnListOfClass(entityType));
             responseMap.put("tabs", getTabListOfClass(entityType));
         } else {
@@ -144,6 +145,8 @@ public class MetaDataService {
         columnsMap.put("itemText", fieldMeta.itemText());
         columnsMap.put("sortable", fieldMeta.sortable());
         columnsMap.put("showInTable", fieldMeta.showInTable());
+        columnsMap.put("showInForm", fieldMeta.showInForm());
+        columnsMap.put("factory", fieldMeta.factory());
         columnsMap.put("searchable", fieldMeta.searchable());
         columnsMap.put("updatable", fieldMeta.updatable());
 

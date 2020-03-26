@@ -42,6 +42,10 @@ public @interface MetaColumn {
 
     boolean showInTable() default false; // custom
 
+    boolean showInForm() default true; // custom
+
+    boolean factory() default false;
+
     int width() default 20; // custom
 
     int min() default 1; // default

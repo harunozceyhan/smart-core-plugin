@@ -19,4 +19,7 @@ public @interface Metadata {
     String getUrl() default "";
 
     String responseKey() default "";
+
+    boolean factory() default false;
+
 }
