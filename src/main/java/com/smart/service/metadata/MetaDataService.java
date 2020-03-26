@@ -139,7 +139,7 @@ public class MetaDataService {
         columnsMap.put("tableValue", fieldMeta.tableValue().equals("") ? field.getName() : fieldMeta.tableValue());
         columnsMap.put("searchKey", fieldMeta.searchKey().equals("") ? field.getName() : fieldMeta.searchKey());
         columnsMap.put("width", fieldMeta.width());
-        columnsMap.put("url", fieldMeta.contextPath() + fieldMeta.url());
+        columnsMap.put("url", fieldMeta.contextPath() + "/" + fieldMeta.url());
         columnsMap.put("responseKey", fieldMeta.responseKey());
         columnsMap.put("itemText", fieldMeta.itemText());
         columnsMap.put("sortable", fieldMeta.sortable());
